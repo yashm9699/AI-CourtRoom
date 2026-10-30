@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: ai-trial-room
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm --prefix client install --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health

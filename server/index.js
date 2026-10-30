@@ -2,12 +2,17 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import mongoose from 'mongoose';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { existsSync } from 'node:fs';
 import Case from './models/Case.js';
 import Session from './models/Session.js';
 import { seedCases } from './data/seed.js';
 import { askWitness, judgeObjection } from './lib/gemini.js';
 
 const app = express();
+const serverDir = path.dirname(fileURLToPath(import.meta.url));
+const clientDist = path.resolve(serverDir, '../client/dist');
 app.use(cors({ origin: process.env.CLIENT_ORIGIN?.split(',') ?? true }));
 app.use(express.json());
 let memoryCases = seedCases.map((item, index) => ({ ...item, _id: `local-${index + 1}` }));
@@ -91,6 +96,10 @@ app.post('/api/trial/objection', async (req, res, next) => {
     res.json({ session, ruling: result });
   } catch (error) { next(error); }
 });
+if (existsSync(clientDist)) {
+  app.use(express.static(clientDist));
+  app.get(/^\/(?!api(?:\/|$)).*/, (_req, res) => res.sendFile(path.join(clientDist, 'index.html')));
+}
 app.use((error, _req, res, _next) => { console.error(error); res.status(500).json({ error: 'The court encountered an unexpected issue.' }); });
 
 const port = Number(process.env.PORT || 4000);

@@ -13,6 +13,16 @@ To start only the frontend, run `cd client` followed by `npm run dev`. To start 
 
 The API starts on port 4000 by default. The Vite development server forwards `/api` requests to it.
 
+## Deploy a shareable live site
+
+The root `render.yaml` configures a single Render web service that builds the React client and serves it from Express alongside the API.
+
+1. Push the latest project commit to GitHub.
+2. In Render, choose **New → Blueprint**, connect this GitHub repository, and deploy the `render.yaml` blueprint.
+3. After the deploy succeeds, open the `onrender.com` URL shown in the Render dashboard and share it.
+
+The app runs with seeded cases and in-memory sessions without additional services. Those sessions reset when the service restarts. To enable Gemini, add a newly rotated `GEMINI_API_KEY` in the Render service's Environment settings. For persistent sessions, also add a MongoDB `MONGODB_URI`. Never put either secret in this repository; add them in Render's dashboard.
+
 ## API
 
 - `GET /api/cases` lists available case files.
